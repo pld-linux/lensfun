@@ -7,13 +7,16 @@ Release:	0.1
 License:	LGPL
 Group:		Libraries
 Source0:	http://download.berlios.de/lensfun/%{name}-%{version}.tar.bz2
+# Source0-md5:	c5c04be4f53e3eef450ff4948d8f65b3
 URL:		http://developer.berlios.de/projects/lensfun/
-BuildRequires:	make >= 3.81
-#BuildRequires:	xorg-util-gccmakedep >= 1.0.2
+Patch0:		%{name}-build.patch
 BuildRequires:	doxygen >= 1.5.0
 BuildRequires:	glib2-devel >= 2.0.0
 BuildRequires:	libpng >= 1.0
-BuildRequires:	zlib
+BuildRequires:	libstdc++-devel
+BuildRequires:	make >= 3.81
+BuildRequires:	python
+BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -30,13 +33,13 @@ szczegółową charakterystykę obiektywu.
 %package devel
 Summary:	lensfun library header files
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki lensfun
-Group:          Development/Libraries
-Requires:       %{name} = %{version}-%{release}
+Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
 lensfun library header files.
 
-%description -l pl.UTF-8 devel
+%description devel -l pl.UTF-8
 Pliki nagłówkowe biblioteki lensfun.
 
 %package apidocs
@@ -47,48 +50,39 @@ Group:		Documentation
 %description apidocs
 lensfun library API documentation.
 
-%description -l pl.UTF-8 apidocs
+%description apidocs -l pl.UTF-8
 Dokumentacja API biblioteki lensfun.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-./configure --prefix=%{_prefix}
+# configure is a python application which tries to mimic autoconf
+CC="%{__cc}" \
+CXX="%{__cxx}" \
+LD="%{__cxx}" \
+./configure \
+ 	--prefix=%{_prefix} \
+	--bindir=%{_bindir} \
+	--sysconfdir=%{_sysconfdir} \
+	--datadir=%{_datadir}/%{name} \
+	--libdir=%{_libdir} \
+	--includedir=%{_includedir} \
+	--libexecdir=%{_libexecdir} \
+	--cflags="%{rpmcflags}" \
+	--cxxflags="%{rpmcxxflags}" \
+ 	--ldflags="%{rpmldflags}" \
+	--compiler="gcc"
 
-# TODO:
-# Can't use:
-# LDFLAGS="%{rpmldflags}" \
-# It doesn't work.
-# 
-# Command
-# make CFLAGS=-O2 -fno-strict-aliasing -fwrapv -march=i686 -mtune=pentium4 -gdwarf-2 -g2  all
-# works OK
-#
-# Command
-# make CFLAGS=-O2 -fno-strict-aliasing -fwrapv -march=i686 -mtune=pentium4 -gdwarf-2 -g2  LDFLAGS=-Wl,--as-needed -Wl,-z,relro -Wl,-z,-combreloc  all
-# gives a lot of errors such as:
-# out/posix/release/liblensfun.so: undefined reference to `g_markup_error_quark
-
-%{__make} \
-	CFLAGS="%{rpmcflags}" \
-	all
+# 'all' is not the default target
+%{__make} all
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
-
-# TODO:
-# The link "liblensfun.so" as created by build process points to "liblensfun.so.0".
-# This creates dependency "lensfun-devel requires /usr/lib/liblensfun.so.0".
-# But liblensfun.so.0 is created in %post script by ldconfig and such requirement
-# can not be satisfied.
-(
-	cd $RPM_BUILD_ROOT/%{_libdir}
-	ln -sf liblensfun.so.*.*.* liblensfun.so
-)
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -99,7 +93,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc README
-%{_libdir}/liblensfun.so.*.*.*
+%attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
 %{_datadir}/lensfun
 
 %files devel
