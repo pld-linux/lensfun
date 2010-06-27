@@ -1,5 +1,5 @@
---- lensfun-0.2.3/ac.py~orig	2008-07-14 21:28:32.000000000 +0200
-+++ lensfun-0.2.3/ac.py	2008-11-19 18:51:55.000000000 +0100
+--- lensfun-0.2.3/tibs.py~orig	2008-07-14 21:28:32.000000000 +0200
++++ lensfun-0.2.3/tibs.py	2008-11-19 18:51:55.000000000 +0100
 @@ -301,7 +301,6 @@
  
      add_config_h ("PLATFORM_" + TARGET [0].upper ())
@@ -8,49 +8,49 @@
  
      add_config_mak ("HOST", HOST [0])
      add_config_mak ("TARGET", TARGET [0])
---- lensfun-0.2.3/ac.py~orig	2008-11-19 18:56:06.000000000 +0100
-+++ lensfun-0.2.3/ac.py	2008-11-19 18:56:54.000000000 +0100
+--- lensfun-0.2.3/tibs.py~orig	2008-11-19 18:56:06.000000000 +0100
++++ lensfun-0.2.3/tibs.py	2008-11-19 18:56:54.000000000 +0100
 @@ -142,7 +142,6 @@
              add_config_h ("CONF_SYMBOL_VISIBILITY")
  
          check_cflags ("-Wno-non-virtual-dtor", "CXXFLAGS", "-Werror")
 -        check_cflags ("-mtune=" + TARGET [2], "CFLAGS")
-         try:
-             self.sse_supported.index (TARGET [2])
-             if check_cflags ("-mfpmath=sse", "CFLAGS"):
---- lensfun-0.2.3/build/mak/compiler/gcc.mak~orig	2008-05-11 17:50:15.000000000 +0200
-+++ lensfun-0.2.3/build/mak/compiler/gcc.mak	2008-11-19 19:03:12.000000000 +0100
+ 
+         add_config_mak ("GCC.CC", self.CC + " -c")
+         add_config_mak ("GCC.CXX", self.CXX + " -c")
+--- lensfun-0.2.3/build/tibs/compiler/gcc.mak~orig	2008-05-11 17:50:15.000000000 +0200
++++ lensfun-0.2.3/build/tibs/compiler/gcc.mak	2008-11-19 19:03:12.000000000 +0100
 @@ -71,7 +71,7 @@
  endef
  
  LINK.GCC.AR = $(GCC.AR) $(GCC.ARFLAGS) $@ $^
 -LINK.GCC.EXEC = $(GCC.LD) -o $@ $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
 +LINK.GCC.EXEC = $(GCC.LD) -o $@ $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
- define LINK.GCC.SO
+ define LINK.GCC.SO.VER
  	$(GCC.LD) -o $@.$(SHARED.$3) -Wl,"-soname=$(notdir $@).$(basename $(basename $(SHARED.$3)))" $(GCC.LDFLAGS.SHARED) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
  	ln -fs $(notdir $@.$(SHARED.$3)) $@.$(basename $(basename $(SHARED.$3)))
---- lensfun-0.2.3/build/mak/compiler/gcc.mak~orig	2008-11-19 19:05:55.000000000 +0100
-+++ lensfun-0.2.3/build/mak/compiler/gcc.mak	2008-11-19 19:09:17.000000000 +0100
+--- lensfun-0.2.3/build/tibs/compiler/gcc.mak~orig	2008-11-19 19:05:55.000000000 +0100
++++ lensfun-0.2.3/build/tibs/compiler/gcc.mak	2008-11-19 19:09:17.000000000 +0100
 @@ -73,9 +73,8 @@
  LINK.GCC.AR = $(GCC.AR) $(GCC.ARFLAGS) $@ $^
  LINK.GCC.EXEC = $(GCC.LD) -o $@ $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
- define LINK.GCC.SO
--	$(GCC.LD) -o $@.$(SHARED.$3) -Wl,"-soname=$(notdir $@).$(basename $(basename $(SHARED.$3)))" $(GCC.LDFLAGS.SHARED) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
+ define LINK.GCC.SO.VER
+-	$(GCC.LD) -o $@.$(SHARED.$3) $(call GCC.LDFLAGS.SHARED,$(notdir $@).$(basename $(basename $(SHARED.$3))),$(dir $@)) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
 -	ln -fs $(notdir $@.$(SHARED.$3)) $@.$(basename $(basename $(SHARED.$3)))
 -	ln -fs $(notdir $@.$(basename $(basename $(SHARED.$3)))) $@
-+	$(GCC.LD) -o $@.$(SHARED.$3) -Wl,"-soname=$(notdir $@).$(basename $(basename $(SHARED.$3)))" $(GCC.LDFLAGS.SHARED) $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
++	$(GCC.LD) -o $@.$(SHARED.$3) $(call GCC.LDFLAGS.SHARED,$(notdir $@).$(basename $(basename $(SHARED.$3))),$(dir $@)) $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
 +	ln -fs $(notdir $@.$(SHARED.$3)) $@
  endef
- 
- # Linking rules ($1 = target full filename, $2 = dependency list,
---- lensfun-0.2.3/build/mak/compiler/gcc.mak~orig	2008-11-19 19:09:32.000000000 +0100
-+++ lensfun-0.2.3/build/mak/compiler/gcc.mak	2008-11-19 19:11:39.000000000 +0100
+ define LINK.GCC.SO.NOVER
+ 	$(GCC.LD) -o $@ $(call GCC.LDFLAGS.SHARED,$(notdir $@),$(dir $@)) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
+--- lensfun-0.2.3/build/tibs/compiler/gcc.mak~orig	2008-11-19 19:09:32.000000000 +0100
++++ lensfun-0.2.3/build/tibs/compiler/gcc.mak	2008-11-19 19:11:39.000000000 +0100
 @@ -93,7 +93,7 @@
  # $3 = full target file name)
  define MKIRULES.GCC
  $(if $(findstring $L,$2),\
--$(foreach _,$3 $(if $(SHARED.$2),$3.$(SHARED.$2) $3.$(basename $(basename $(SHARED.$2)))),
-+$(foreach _,$3 $(if $(SHARED.$2),$3.$(SHARED.$2)),
- 	$(if $V,,@echo INSTALL $_ to $(call .INSTDIR,$1,$2,$(CONF_LIBDIR)) &&)\
- 	$$(call INSTALL,$_,$(call .INSTDIR,$1,$2,$(CONF_LIBDIR)),$(if $(SHARED.$2),0755,0644))))\
+-$(foreach _,$3 $(if $(call VALID_VERSION,$(SHARED.$2)),$3.$(basename $(basename $(SHARED.$2))) $3.$(SHARED.$2)),
++$(foreach _,$3 $(if $(call VALID_VERSION,$(SHARED.$2)),$3.$(SHARED.$2)),
+ 	$(if $V,,@echo INSTALL $_ to $(call .INSTDIR,$1,$2,LIB,$(CONF_LIBDIR)) &&)\
+ 	$$(call INSTALL,$_,$(call .INSTDIR,$1,$2,LIB,$(CONF_LIBDIR)),$(call .INSTMODE,$1,$2,$(if $(SHARED.$2),0755,0644)))))\
  $(if $(findstring $E,$2),
