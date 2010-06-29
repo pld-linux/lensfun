@@ -1,12 +1,9 @@
 #
-# TODO:
-# - install manuals and
-#
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
 Version:	0.2.5
-Release:	0.1
+Release:	1
 License:	LGPLv3 and CC-BY-SA
 Group:		Libraries
 Source0:	http://download.berlios.de/lensfun/%{name}-%{version}.tar.bz2
@@ -86,6 +83,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+%{__gzip} -9 $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{README,cc-by-sa-3.0.txt}
+rm $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{gpl-3.0.txt,lgpl-3.0.txt}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -95,7 +94,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc README docs/cc-by-sa-3.0.txt
+%{_docdir}/%{name}-%{version}/README.gz
+%{_docdir}/%{name}-%{version}/cc-by-sa-3.0.txt.gz
+%dir %{_docdir}/%{name}-%{version}
 %attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
 %{_datadir}/lensfun
 
@@ -107,3 +108,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files apidocs
 %defattr(644,root,root,755)
+%{_docdir}/%{name}-%{version}/manual
