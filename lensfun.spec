@@ -3,13 +3,14 @@ Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
 Version:	0.2.5
-Release:	1
+Release:	2
 License:	LGPLv3 and CC-BY-SA
 Group:		Libraries
 Source0:	http://download.berlios.de/lensfun/%{name}-%{version}.tar.bz2
 # Source0-md5:	a10438dffae68a5988fc54b0393a3755
 URL:		http://developer.berlios.de/projects/lensfun/
 Patch0:		%{name}-build.patch
+Patch1:		%{name}-vectorize.patch
 BuildRequires:	doxygen >= 1.5.0
 BuildRequires:	glib2-devel >= 2.0.0
 BuildRequires:	libpng >= 1.0
@@ -56,6 +57,7 @@ Dokumentacja API biblioteki lensfun.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p0
 
 %build
 # configure is a python application which tries to mimic autoconf
