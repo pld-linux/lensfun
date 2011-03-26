@@ -1,10 +1,9 @@
-#
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
 Version:	0.2.5
 Release:	2
-License:	LGPLv3 and CC-BY-SA
+License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
 Source0:	http://download.berlios.de/lensfun/%{name}-%{version}.tar.bz2
 # Source0-md5:	a10438dffae68a5988fc54b0393a3755
@@ -28,12 +27,13 @@ calibration data.
 
 %description -l pl.UTF-8
 Projekt dostarcza bazę danych obiektywów oraz bibliotekę pozwalającą
-na dstęp do bazy i dodatkowo oferującą korekcję zdjęć w oparciu o
+na dostęp do bazy i dodatkowo oferującą korekcję zdjęć w oparciu o
 szczegółową charakterystykę obiektywu.
 
 %package devel
 Summary:	lensfun library header files
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki lensfun
+License:	LGPL v3
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
@@ -65,7 +65,7 @@ CC="%{__cc}" \
 CXX="%{__cxx}" \
 LD="%{__cxx}" \
 ./configure \
- 	--prefix=%{_prefix} \
+	--prefix=%{_prefix} \
 	--bindir=%{_bindir} \
 	--sysconfdir=%{_sysconfdir} \
 	--datadir=%{_datadir}/%{name} \
@@ -74,7 +74,7 @@ LD="%{__cxx}" \
 	--libexecdir=%{_libexecdir} \
 	--cflags="%{rpmcflags}" \
 	--cxxflags="%{rpmcxxflags}" \
- 	--ldflags="%{rpmldflags}" \
+	--ldflags="%{rpmldflags}" \
 	--compiler="gcc"
 
 # 'all' is not the default target
@@ -86,7 +86,9 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 %{__gzip} -9 $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{README,cc-by-sa-3.0.txt}
-rm $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{gpl-3.0.txt,lgpl-3.0.txt}
+%{__rm} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{gpl-3.0.txt,lgpl-3.0.txt}
+
+/sbin/ldconfig -n $RPM_BUILD_ROOT%{_libdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -96,16 +98,17 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/liblensfun.so.0
+%{_datadir}/lensfun
 %{_docdir}/%{name}-%{version}/README.gz
 %{_docdir}/%{name}-%{version}/cc-by-sa-3.0.txt.gz
 %dir %{_docdir}/%{name}-%{version}
-%attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
-%{_datadir}/lensfun
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/liblensfun.so
 %{_includedir}/lensfun.h
-%{_libdir}/liblensfun.so
 %{_pkgconfigdir}/lensfun.pc
 
 %files apidocs
