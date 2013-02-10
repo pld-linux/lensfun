@@ -1,15 +1,15 @@
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
-Version:	0.2.5
-Release:	2
+Version:	0.2.6
+Release:	1
 License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
 Source0:	http://download.berlios.de/lensfun/%{name}-%{version}.tar.bz2
-# Source0-md5:	a10438dffae68a5988fc54b0393a3755
+# Source0-md5:	740e4749db04da0a597630dd6339b966
 URL:		http://developer.berlios.de/projects/lensfun/
 Patch0:		%{name}-build.patch
-Patch1:		%{name}-vectorize.patch
+BuildRequires:	cmake
 BuildRequires:	doxygen >= 1.5.0
 BuildRequires:	glib2-devel >= 2.0.0
 BuildRequires:	libpng >= 1.0
@@ -17,6 +17,7 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	make >= 3.81
 BuildRequires:	python
 BuildRequires:	zlib-devel
+Obsoletes:	lensfun-apidocs
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -43,52 +44,25 @@ lensfun library header files.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe biblioteki lensfun.
 
-%package apidocs
-Summary:	lensfun library API documentation
-Summary(pl.UTF-8):	Dokumentacja API biblioteki lensfun
-Group:		Documentation
-
-%description apidocs
-lensfun library API documentation.
-
-%description apidocs -l pl.UTF-8
-Dokumentacja API biblioteki lensfun.
-
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p0
 
 %build
-# configure is a python application which tries to mimic autoconf
-CC="%{__cc}" \
-CXX="%{__cxx}" \
-LD="%{__cxx}" \
-./configure \
-	--prefix=%{_prefix} \
-	--bindir=%{_bindir} \
-	--sysconfdir=%{_sysconfdir} \
-	--datadir=%{_datadir}/%{name} \
-	--libdir=%{_libdir} \
-	--includedir=%{_includedir} \
-	--libexecdir=%{_libexecdir} \
-	--cflags="%{rpmcflags}" \
-	--cxxflags="%{rpmcxxflags}" \
-	--ldflags="%{rpmldflags}" \
-	--compiler="gcc"
+install -d build
+cd build
+%{cmake} \
+	-DBUILD_DOC:BOOL=ON \
+	-DBUILD_TESTS:BOOL=OFF \
+	..
 
-# 'all' is not the default target
-%{__make} all V=1
+%{__make} V=1
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
+%{__make} -C build install/fast \
 	DESTDIR=$RPM_BUILD_ROOT
-%{__gzip} -9 $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{README,cc-by-sa-3.0.txt}
-%{__rm} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/{gpl-3.0.txt,lgpl-3.0.txt}
-
-/sbin/ldconfig -n $RPM_BUILD_ROOT%{_libdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -98,19 +72,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
+%doc README docs/cc-by-sa-3.0.txt
 %attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/liblensfun.so.0
 %{_datadir}/lensfun
-%{_docdir}/%{name}-%{version}/README.gz
-%{_docdir}/%{name}-%{version}/cc-by-sa-3.0.txt.gz
-%dir %{_docdir}/%{name}-%{version}
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/liblensfun.so
-%{_includedir}/lensfun.h
+%{_includedir}/lensfun
 %{_pkgconfigdir}/lensfun.pc
-
-%files apidocs
-%defattr(644,root,root,755)
-%{_docdir}/%{name}-%{version}/manual

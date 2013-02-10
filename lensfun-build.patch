@@ -1,56 +1,44 @@
---- lensfun-0.2.3/tibs.py~orig	2008-07-14 21:28:32.000000000 +0200
-+++ lensfun-0.2.3/tibs.py	2008-11-19 18:51:55.000000000 +0100
-@@ -301,7 +301,6 @@
- 
-     add_config_h ("PLATFORM_" + TARGET [0].upper ())
-     add_config_h ("ARCH_" + TARGET [1].upper ())
--    add_config_h ("TUNE_" + TARGET [2].upper ())
- 
-     add_config_mak ("HOST", HOST [0])
-     add_config_mak ("TARGET", TARGET [0])
---- lensfun-0.2.3/tibs.py~orig	2008-11-19 18:56:06.000000000 +0100
-+++ lensfun-0.2.3/tibs.py	2008-11-19 18:56:54.000000000 +0100
-@@ -142,7 +142,6 @@
-             add_config_h ("CONF_SYMBOL_VISIBILITY")
- 
-         check_cflags ("-Wno-non-virtual-dtor", "CXXFLAGS", "-Werror")
--        check_cflags ("-mtune=" + TARGET [2], "CFLAGS")
- 
-         add_config_mak ("GCC.CC", self.CC + " -c")
-         add_config_mak ("GCC.CXX", self.CXX + " -c")
---- lensfun-0.2.3/build/tibs/compiler/gcc.mak~orig	2008-05-11 17:50:15.000000000 +0200
-+++ lensfun-0.2.3/build/tibs/compiler/gcc.mak	2008-11-19 19:03:12.000000000 +0100
-@@ -71,7 +71,7 @@
- endef
- 
- LINK.GCC.AR = $(GCC.AR) $(GCC.ARFLAGS) $@ $^
--LINK.GCC.EXEC = $(GCC.LD) -o $@ $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
-+LINK.GCC.EXEC = $(GCC.LD) -o $@ $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
- define LINK.GCC.SO.VER
- 	$(GCC.LD) -o $@.$(SHARED.$3) -Wl,"-soname=$(notdir $@).$(basename $(basename $(SHARED.$3)))" $(GCC.LDFLAGS.SHARED) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
- 	ln -fs $(notdir $@.$(SHARED.$3)) $@.$(basename $(basename $(SHARED.$3)))
---- lensfun-0.2.3/build/tibs/compiler/gcc.mak~orig	2008-11-19 19:05:55.000000000 +0100
-+++ lensfun-0.2.3/build/tibs/compiler/gcc.mak	2008-11-19 19:09:17.000000000 +0100
-@@ -73,9 +73,8 @@
- LINK.GCC.AR = $(GCC.AR) $(GCC.ARFLAGS) $@ $^
- LINK.GCC.EXEC = $(GCC.LD) -o $@ $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
- define LINK.GCC.SO.VER
--	$(GCC.LD) -o $@.$(SHARED.$3) $(call GCC.LDFLAGS.SHARED,$(notdir $@).$(basename $(basename $(SHARED.$3))),$(dir $@)) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
--	ln -fs $(notdir $@.$(SHARED.$3)) $@.$(basename $(basename $(SHARED.$3)))
--	ln -fs $(notdir $@.$(basename $(basename $(SHARED.$3)))) $@
-+	$(GCC.LD) -o $@.$(SHARED.$3) $(call GCC.LDFLAGS.SHARED,$(notdir $@).$(basename $(basename $(SHARED.$3))),$(dir $@)) $(GCC.LDFLAGS) $(LDFLAGS) $^ $1 $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
-+	ln -fs $(notdir $@.$(SHARED.$3)) $@
- endef
- define LINK.GCC.SO.NOVER
- 	$(GCC.LD) -o $@ $(call GCC.LDFLAGS.SHARED,$(notdir $@),$(dir $@)) $(GCC.LDFLAGS) $(LDFLAGS) $1 $^ $(GCC.LDFLAGS.LIBS) $(LDFLAGS.LIBS) $2
---- lensfun-0.2.3/build/tibs/compiler/gcc.mak~orig	2008-11-19 19:09:32.000000000 +0100
-+++ lensfun-0.2.3/build/tibs/compiler/gcc.mak	2008-11-19 19:11:39.000000000 +0100
-@@ -93,7 +93,7 @@
- # $3 = full target file name)
- define MKIRULES.GCC
- $(if $(findstring $L,$2),\
--$(foreach _,$3 $(if $(call VALID_VERSION,$(SHARED.$2)),$3.$(basename $(basename $(SHARED.$2))) $3.$(SHARED.$2)),
-+$(foreach _,$3 $(if $(call VALID_VERSION,$(SHARED.$2)),$3.$(SHARED.$2)),
- 	$(if $V,,@echo INSTALL $_ to $(call .INSTDIR,$1,$2,LIB,$(CONF_LIBDIR)) &&)\
- 	$$(call INSTALL,$_,$(call .INSTDIR,$1,$2,LIB,$(CONF_LIBDIR)),$(call .INSTMODE,$1,$2,$(if $(SHARED.$2),0755,0644)))))\
- $(if $(findstring $E,$2),
+diff -up lensfun-0.2.6/CMakeLists.txt.LIB_SUFFIX lensfun-0.2.6/CMakeLists.txt
+--- lensfun-0.2.6/CMakeLists.txt.LIB_SUFFIX	2012-06-10 09:19:35.000000000 -0500
++++ lensfun-0.2.6/CMakeLists.txt	2012-06-28 08:32:16.628591449 -0500
+@@ -74,7 +74,7 @@ ENDIF()
+  
+ # define destination dirs (relative to prefix)
+ SET(BINDIR bin)
+-SET(LIBDIR lib)
++SET(LIBDIR lib${LIB_SUFFIX})
+ SET(INCLUDEDIR include)
+ SET(DATADIR share/lensfun)
+ SET(DOCDIR share/doc/lensfun-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_MICRO}.${VERSION_BUGFIX})
+diff --git a/libs/lensfun/CMakeLists.txt b/libs/lensfun/CMakeLists.txt
+index ef3dcf0..253a08c 100644
+--- a/libs/lensfun/CMakeLists.txt
++++ b/libs/lensfun/CMakeLists.txt
+@@ -26,3 +26,8 @@ INSTALL(TARGETS lensfun
+         RUNTIME DESTINATION ${BINDIR}
+         LIBRARY DESTINATION ${LIBDIR}
+         ARCHIVE DESTINATION ${LIBDIR})
++
++# pkgconfig support
++CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/lensfun.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/lensfun.pc @ONLY)
++INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/lensfun.pc DESTINATION ${LIBDIR}/pkgconfig )
++
+diff --git a/libs/lensfun/lensfun.pc.cmake b/libs/lensfun/lensfun.pc.cmake
+new file mode 100644
+index 0000000..6d14b12
+--- /dev/null
++++ b/libs/lensfun/lensfun.pc.cmake
+@@ -0,0 +1,13 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++bindir=@CMAKE_INSTALL_PREFIX@/@BINDIR@
++libdir=@CMAKE_INSTALL_PREFIX@/@LIBDIR@
++includedir=@CMAKE_INSTALL_PREFIX@/@INCLUDEDIR@
++datadir=@CMAKE_INSTALL_PREFIX@/@DATADIR@
++docdir=@CMAKE_INSTALL_PREFIX@/@DOCDIR@
++
++Name: lensfun
++Description: A photographic lens database and access library
++Version: @VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_MICRO@.@VERSION_BUGFIX@
++Requires.private: glib-2.0
++Libs: -L${libdir} -llensfun
++Cflags: -I${includedir} -I${includedir}/lensfun
