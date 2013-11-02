@@ -44,6 +44,17 @@ lensfun library header files.
 %description devel -l pl.UTF-8
 Pliki nagłówkowe biblioteki lensfun.
 
+%package apidocs
+Summary:	lensfun API documentation
+Summary(pl.UTF-8):	Dokumentacja API biblioteki lensfun
+Group:		Documentation
+
+%description apidocs
+lensfun API documentation.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API biblioteki lensfun.
+
 %prep
 %setup -q
 
@@ -63,6 +74,9 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -C build install/fast \
 	DESTDIR=$RPM_BUILD_ROOT
 
+# packaged as %doc in -apidocs
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/lensfun-0.2.8.0
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -71,7 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc README docs/cc-by-sa-3.0.txt
+%doc README docs/{adobe-lens-profile,cc-by-sa-3.0,manual-main,mounts}.txt
 %attr(755,root,root) %{_libdir}/libauxfun.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libauxfun.so.0
 %attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
@@ -85,3 +99,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/auxfun
 %{_includedir}/lensfun
 %{_pkgconfigdir}/lensfun.pc
+
+%files apidocs
+%defattr(644,root,root,755)
+%doc build/doc_doxygen/*
