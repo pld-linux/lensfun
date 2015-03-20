@@ -15,6 +15,7 @@ BuildRequires:	glib2-devel >= 2.0.0
 BuildRequires:	libpng-devel >= 1.0
 BuildRequires:	libstdc++-devel
 BuildRequires:	make >= 3.81
+BuildRequires:	pkgconfig
 BuildRequires:	python
 BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRequires:	zlib-devel >= 1.0
