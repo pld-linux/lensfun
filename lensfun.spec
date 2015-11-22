@@ -1,13 +1,12 @@
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
-Version:	0.3.1
+Version:	0.3.2
 Release:	1
 License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/lensfun/%{name}-%{version}.tar.gz
-# Source0-md5:	7f577385f98b260ea5384b99c6eb03aa
-Patch0:		FHS.patch
+# Source0-md5:	247e59a0812ec451f6cd0d20b3379cb5
 URL:		http://lensfun.sourceforge.net/
 BuildRequires:	cmake >= 2.8
 BuildRequires:	docutils
@@ -60,7 +59,6 @@ Dokumentacja API biblioteki lensfun.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 install -d build
@@ -68,7 +66,8 @@ cd build
 %cmake .. \
 	-DBUILD_AUXFUN:BOOL=ON \
 	-DBUILD_DOC:BOOL=ON \
-	-DBUILD_TESTS:BOOL=OFF
+	-DBUILD_TESTS:BOOL=OFF \
+	-DCMAKE_INSTALL_DOCDIR:PATH=%{_docdir}/%{name}
 
 %{__make}
 
@@ -78,7 +77,7 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 # packaged as %doc in -apidocs
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}.0
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -88,9 +87,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc README docs/{adobe-lens-profile,cc-by-sa-3.0,manual-main,mounts}.txt
+%doc ChangeLog README.md docs/{cc-by-sa-3.0,manual-main,mounts}.txt
 %attr(755,root,root) %{_libdir}/liblensfun.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/liblensfun.so.0
+%attr(755,root,root) %ghost %{_libdir}/liblensfun.so.1
 %attr(755,root,root) %{_bindir}/g-lensfun-update-data
 %attr(755,root,root) %{_bindir}/lensfun-add-adapter
 %attr(755,root,root) %{_bindir}/lensfun-update-data
