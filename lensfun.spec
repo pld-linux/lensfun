@@ -64,6 +64,9 @@ Dokumentacja API biblioteki lensfun.
 %setup -q
 %patch0 -p1
 
+%{__sed} -i -e '1s,/usr/bin/env python3,%{__python3},' apps/lensfun-{add-adapter,update-data}
+%{__sed} -i -e '1s,/usr/bin/env sh,%{__sh},' apps/g-lensfun-update-data
+
 %build
 install -d build
 cd build
