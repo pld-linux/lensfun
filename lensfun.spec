@@ -1,3 +1,15 @@
+#
+# Conditional build:
+%bcond_with	sse		# SSE instructions
+%bcond_with	sse2		# SSE2 instructions
+
+%ifarch pentium3 pentium4 %{x8664} x32
+%define	with_sse	1
+%endif
+%ifarch pentium4 %{x8664} x32
+%define	with_sse2	1
+%endif
+
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
@@ -73,6 +85,8 @@ cd build
 %cmake .. \
 	-DBUILD_AUXFUN:BOOL=ON \
 	-DBUILD_DOC:BOOL=ON \
+	%{cmake_on_off sse BUILD_FOR_SSE} \
+	%{cmake_on_off sse2 BUILD_FOR_SSE2} \
 	-DBUILD_TESTS:BOOL=OFF \
 	-DCMAKE_INSTALL_DOCDIR:PATH=%{_docdir}/%{name}
 
