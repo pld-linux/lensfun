@@ -7,6 +7,7 @@ License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/lensfun/%{name}-%{version}.tar.gz
 # Source0-md5:	247e59a0812ec451f6cd0d20b3379cb5
+Patch0:		0060-Various-CMake-patches-from-the-mailing-list.patch
 URL:		http://lensfun.sourceforge.net/
 BuildRequires:	cmake >= 2.8
 BuildRequires:	docutils
@@ -61,6 +62,7 @@ Dokumentacja API biblioteki lensfun.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 install -d build
