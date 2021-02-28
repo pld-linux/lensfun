@@ -62,9 +62,7 @@ Pliki nagłówkowe biblioteki lensfun.
 Summary:	lensfun API documentation
 Summary(pl.UTF-8):	Dokumentacja API biblioteki lensfun
 Group:		Documentation
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description apidocs
 lensfun API documentation.
