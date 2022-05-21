@@ -1,0 +1,37 @@
+gegl calls lf_db_load() in parallel, glibc doesn't support parallel regcomp() of the same regex
+
+--- lensfun-0.3.3/libs/lensfun/lens.cpp.orig	2022-02-22 21:49:04.000000000 +0100
++++ lensfun-0.3.3/libs/lensfun/lens.cpp	2022-05-21 18:13:46.981677714 +0200
+@@ -15,6 +15,12 @@
+ #include "windows/mathconstants.h"
+ #include <algorithm>
+ 
++#if defined(GLIB_CHECK_VERSION) && GLIB_CHECK_VERSION(2,32,0)
++static GMutex lens_name_regex_lock;
++#else
++static GStaticMutex lock = G_STATIC_MUTEX_INIT;
++#endif
++
+ static struct
+ {
+     const char *regex;
+@@ -69,9 +75,19 @@ static bool _lf_parse_lens_name (const c
+     {
+         if (!lens_name_regex [i].compiled)
+         {
++#if defined(GLIB_CHECK_VERSION) && GLIB_CHECK_VERSION(2,32,0)
++            g_mutex_lock (&lens_name_regex_lock);
++#else
++            g_static_mutex_lock (&lens_name_regex_lock);
++#endif
+             regcomp (&lens_name_regex [i].rex, lens_name_regex [i].regex,
+                      REG_EXTENDED | REG_ICASE);
+             lens_name_regex [i].compiled = true;
++#if defined(GLIB_CHECK_VERSION) && GLIB_CHECK_VERSION(2,32,0)
++            g_mutex_unlock (&lens_name_regex_lock);
++#else
++            g_static_mutex_unlock (&lens_name_regex_lock);
++#endif
+         }
+ 
+         regmatch_t matches [10];

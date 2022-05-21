@@ -20,6 +20,7 @@ Group:		Libraries
 #Source0Download: https://github.com/lensfun/lensfun/releases
 Source0:	https://github.com/lensfun/lensfun/archive/v%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	04e0b58fd685ee680b0d70d61f0a5c17
+Patch0:		%{name}-regex-lock.patch
 URL:		http://lensfun.sourceforge.net/
 BuildRequires:	cmake >= 2.8
 BuildRequires:	docutils
@@ -86,6 +87,7 @@ Interfejs Pythoan 3 do lensfun.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python3,%{__python3},' apps/lensfun-{add-adapter,update-data}
 %{__sed} -i -e '1s,/usr/bin/env sh,%{__sh},' apps/g-lensfun-update-data
