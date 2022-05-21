@@ -13,13 +13,13 @@
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
-Version:	0.3.2
-Release:	2
+Version:	0.3.3
+Release:	1
 License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
-Source0:	http://downloads.sourceforge.net/lensfun/%{name}-%{version}.tar.gz
-# Source0-md5:	247e59a0812ec451f6cd0d20b3379cb5
-Patch0:		0060-Various-CMake-patches-from-the-mailing-list.patch
+#Source0Download: https://github.com/lensfun/lensfun/releases
+Source0:	https://github.com/lensfun/lensfun/archive/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	04e0b58fd685ee680b0d70d61f0a5c17
 URL:		http://lensfun.sourceforge.net/
 BuildRequires:	cmake >= 2.8
 BuildRequires:	docutils
@@ -29,7 +29,9 @@ BuildRequires:	libpng-devel >= 1.0
 BuildRequires:	libstdc++-devel
 BuildRequires:	make >= 3.81
 BuildRequires:	pkgconfig
-BuildRequires:	python
+BuildRequires:	python3
+BuildRequires:	python3-modules >= 1:3.2
+BuildRequires:	python3-setuptools
 BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRequires:	zlib-devel >= 1.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -70,12 +72,26 @@ lensfun API documentation.
 %description apidocs -l pl.UTF-8
 Dokumentacja API biblioteki lensfun.
 
+%package -n python3-lensfun
+Summary:	Python 3 interface to lensfun
+Summary(pl.UTF-8):	Interfejs Pythoan 3 do lensfun
+Group:		Libraries/Python
+Requires:	%{name} = %{version}-%{release}
+
+%description -n python3-lensfun
+Python 3 interface to lensfun.
+
+%description -n python3-lensfun -l pl.UTF-8
+Interfejs Pythoan 3 do lensfun.
+
 %prep
 %setup -q
-%patch0 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python3,%{__python3},' apps/lensfun-{add-adapter,update-data}
 %{__sed} -i -e '1s,/usr/bin/env sh,%{__sh},' apps/g-lensfun-update-data
+
+# disable, will run manually with our args
+%{__sed} -i -e '/INSTALL(.*SETUP_PY.*install/d' apps/CMakeLists.txt
 
 %build
 install -d build
@@ -92,8 +108,13 @@ cd build
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} -C build install/fast \
 	DESTDIR=$RPM_BUILD_ROOT
+
+cd build/apps
+%py3_install
+cd ../..
 
 # packaged as %doc in -apidocs
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
@@ -126,3 +147,8 @@ rm -rf $RPM_BUILD_ROOT
 %files apidocs
 %defattr(644,root,root,755)
 %doc build/doc_doxygen/*
+
+%files -n python3-lensfun
+%defattr(644,root,root,755)
+%{py3_sitescriptdir}/lensfun
+%{py3_sitescriptdir}/lensfun-%{version}-py*.egg-info
