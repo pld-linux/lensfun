@@ -13,13 +13,13 @@
 Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
-Version:	0.3.3
+Version:	0.3.4
 Release:	1
 License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
 #Source0Download: https://github.com/lensfun/lensfun/releases
 Source0:	https://github.com/lensfun/lensfun/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	04e0b58fd685ee680b0d70d61f0a5c17
+# Source0-md5:	b2d70a6cd2d1b2922b26cd37fee0de7f
 Patch0:		%{name}-regex-lock.patch
 URL:		http://lensfun.sourceforge.net/
 BuildRequires:	cmake >= 2.8
