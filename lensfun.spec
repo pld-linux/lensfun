@@ -14,7 +14,7 @@ Summary:	Camera lens database with image correction support
 Summary(pl.UTF-8):	Baza danych obiektywów z funkcją korekcji zdjęć
 Name:		lensfun
 Version:	0.3.4
-Release:	
+Release:	2
 License:	LGPL v3 (library), CC-BY-SA v3.0 (lens database)
 Group:		Libraries
 #Source0Download: https://github.com/lensfun/lensfun/releases
@@ -87,7 +87,7 @@ Interfejs Pythoan 3 do lensfun.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch -P 0 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python3,%{__python3},' apps/lensfun-{add-adapter,update-data}
 %{__sed} -i -e '1s,/usr/bin/env sh,%{__sh},' apps/g-lensfun-update-data
